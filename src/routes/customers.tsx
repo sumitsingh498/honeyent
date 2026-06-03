@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
+import { useState } from "react";
+import { Plus, Pencil, Ban, Download } from "lucide-react";
+import { toast } from "sonner";
 
 import { PageHeader } from "@/components/page-header";
 import { ListShell } from "@/components/list-shell";
@@ -7,27 +9,96 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { customers, inr } from "@/lib/mock-data";
+import { inr } from "@/lib/mock-data";
+import { useErp, newId, active, type CCustomer } from "@/lib/store";
+import { EntityDialog, CancelDialog, type FieldDef } from "@/components/entity-dialog";
+import { generatePdf } from "@/lib/pdf";
 
 export const Route = createFileRoute("/customers")({
   head: () => ({ meta: [{ title: "Customers — Honey Enterprises ERP" }] }),
   component: CustomersPage,
 });
 
+const fields: FieldDef[] = [
+  { name: "code", label: "Code", required: true, half: true, placeholder: "CUST..." },
+  { name: "name", label: "Name", required: true, half: true },
+  { name: "gst", label: "GSTIN", half: true },
+  { name: "mobile", label: "Mobile", required: true, half: true },
+  { name: "city", label: "City", half: true },
+  { name: "creditLimit", label: "Credit Limit", type: "number", half: true },
+  { name: "outstanding", label: "Opening Outstanding", type: "number", half: true },
+  { name: "status", label: "Status", type: "select", half: true,
+    options: [{ label: "Active", value: "Active" }, { label: "Inactive", value: "Inactive" }] },
+];
+
 function CustomersPage() {
+  const customers = useErp((s) => s.customers);
+  const add = useErp((s) => s.add);
+  const update = useErp((s) => s.update);
+  const cancel = useErp((s) => s.cancel);
+
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<CCustomer | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<CCustomer | null>(null);
+
+  const visible = customers.filter((c) => {
+    if (c.cancelled) return false;
+    if (!query) return true;
+    const q = query.toLowerCase();
+    return c.name.toLowerCase().includes(q) || c.gst.toLowerCase().includes(q) || c.mobile.includes(q);
+  });
+
+  function handleSubmit(v: Record<string, unknown>) {
+    if (editing) {
+      update("customers", editing.id, v as Partial<CCustomer>);
+      toast.success(`${editing.name} updated`);
+    } else {
+      add("customers", {
+        id: newId("c"),
+        code: String(v.code),
+        name: String(v.name),
+        gst: String(v.gst || ""),
+        mobile: String(v.mobile),
+        city: String(v.city || ""),
+        creditLimit: Number(v.creditLimit || 0),
+        outstanding: Number(v.outstanding || 0),
+        status: (v.status as CCustomer["status"]) || "Active",
+      });
+      toast.success(`Customer ${v.name} added`);
+    }
+    setEditing(null);
+  }
+
+  function exportPdf() {
+    generatePdf({
+      title: "Customer Master",
+      subtitle: "Active customers only",
+      filename: `customers-${Date.now()}.pdf`,
+      head: ["Code", "Name", "GST", "Mobile", "City", "Credit Limit", "Outstanding", "Status"],
+      body: active(customers).map((c) => [c.code, c.name, c.gst, c.mobile, c.city, inr(c.creditLimit), inr(c.outstanding), c.status]),
+      totals: [{ label: "Total outstanding", value: inr(active(customers).reduce((a, c) => a + c.outstanding, 0)) }],
+    });
+  }
+
   return (
     <div>
       <PageHeader
         title="Customers"
         description="Customer master with GST, credit limits and outstanding."
-        actions={<Button size="sm"><Plus className="mr-1 h-4 w-4" />New customer</Button>}
+        actions={
+          <>
+            <Button variant="outline" size="sm" onClick={exportPdf}><Download className="mr-1 h-4 w-4" />Export PDF</Button>
+            <Button size="sm" onClick={() => { setEditing(null); setOpen(true); }}><Plus className="mr-1 h-4 w-4" />New customer</Button>
+          </>
+        }
       />
       <div className="p-6">
         <ListShell
           toolbar={
             <>
-              <Input placeholder="Search by name, GST, mobile…" className="h-9 max-w-sm bg-background" />
-              <p className="text-xs text-muted-foreground">{customers.length} customers</p>
+              <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by name, GST, mobile…" className="h-9 max-w-sm bg-background" />
+              <p className="text-xs text-muted-foreground">{visible.length} customers</p>
             </>
           }
         >
@@ -42,10 +113,11 @@ function CustomersPage() {
                 <TableHead className="text-right">Credit Limit</TableHead>
                 <TableHead className="text-right">Outstanding</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {customers.map((c) => (
+              {visible.map((c) => (
                 <TableRow key={c.id}>
                   <TableCell className="font-mono text-xs">{c.code}</TableCell>
                   <TableCell className="font-medium">{c.name}</TableCell>
@@ -54,8 +126,10 @@ function CustomersPage() {
                   <TableCell>{c.city}</TableCell>
                   <TableCell className="text-right tabular-nums">{inr(c.creditLimit)}</TableCell>
                   <TableCell className={`text-right tabular-nums ${c.outstanding > 0 ? "text-warning" : "text-muted-foreground"}`}>{inr(c.outstanding)}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={c.status === "Active" ? "bg-success/15 text-success" : "bg-muted text-muted-foreground"}>{c.status}</Badge>
+                  <TableCell><Badge variant="outline" className={c.status === "Active" ? "bg-success/15 text-success" : "bg-muted text-muted-foreground"}>{c.status}</Badge></TableCell>
+                  <TableCell className="text-right whitespace-nowrap">
+                    <Button variant="ghost" size="sm" onClick={() => { setEditing(c); setOpen(true); }}><Pencil className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="sm" onClick={() => setCancelTarget(c)}><Ban className="h-3.5 w-3.5 text-destructive" /></Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -63,6 +137,27 @@ function CustomersPage() {
           </Table>
         </ListShell>
       </div>
+
+      <EntityDialog
+        open={open}
+        onOpenChange={(v) => { setOpen(v); if (!v) setEditing(null); }}
+        title="Customer"
+        fields={fields}
+        mode={editing ? "edit" : "create"}
+        initial={editing ?? { status: "Active" }}
+        onSubmit={handleSubmit}
+      />
+      <CancelDialog
+        open={!!cancelTarget}
+        onOpenChange={(v) => !v && setCancelTarget(null)}
+        title={cancelTarget ? `Remove ${cancelTarget.name}` : "Remove"}
+        onConfirm={(remark) => {
+          if (cancelTarget) {
+            cancel("customers", cancelTarget.id, remark);
+            toast.warning(`${cancelTarget.name} removed`, { description: remark });
+          }
+        }}
+      />
     </div>
   );
 }
