@@ -23,14 +23,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  customers,
   daysUntil,
   inr,
-  orders,
   statusTone,
-  trips,
-  vehicles,
 } from "@/lib/mock-data";
+import { useErp, active } from "@/lib/store";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -43,6 +40,11 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
+  const customers = active(useErp((s) => s.customers));
+  const vehicles = active(useErp((s) => s.vehicles));
+  const orders = active(useErp((s) => s.orders));
+  const trips = active(useErp((s) => s.trips));
+
   const todayRevenue = trips.reduce((a, t) => a + t.revenue, 0);
   const todayProfit = trips.reduce((a, t) => a + (t.revenue - t.expense), 0);
   const outstanding = customers.reduce((a, c) => a + c.outstanding, 0);
