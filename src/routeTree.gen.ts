@@ -13,6 +13,7 @@ import { Route as WeighbridgeRouteImport } from './routes/weighbridge'
 import { Route as VehiclesRouteImport } from './routes/vehicles'
 import { Route as TripsRouteImport } from './routes/trips'
 import { Route as SuppliersRouteImport } from './routes/suppliers'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SalesRouteImport } from './routes/sales'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as PurchasesRouteImport } from './routes/purchases'
@@ -41,6 +42,11 @@ const TripsRoute = TripsRouteImport.update({
 const SuppliersRoute = SuppliersRouteImport.update({
   id: '/suppliers',
   path: '/suppliers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SalesRoute = SalesRouteImport.update({
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/purchases': typeof PurchasesRoute
   '/reports': typeof ReportsRoute
   '/sales': typeof SalesRoute
+  '/settings': typeof SettingsRoute
   '/suppliers': typeof SuppliersRoute
   '/trips': typeof TripsRoute
   '/vehicles': typeof VehiclesRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByTo {
   '/purchases': typeof PurchasesRoute
   '/reports': typeof ReportsRoute
   '/sales': typeof SalesRoute
+  '/settings': typeof SettingsRoute
   '/suppliers': typeof SuppliersRoute
   '/trips': typeof TripsRoute
   '/vehicles': typeof VehiclesRoute
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   '/purchases': typeof PurchasesRoute
   '/reports': typeof ReportsRoute
   '/sales': typeof SalesRoute
+  '/settings': typeof SettingsRoute
   '/suppliers': typeof SuppliersRoute
   '/trips': typeof TripsRoute
   '/vehicles': typeof VehiclesRoute
@@ -147,6 +156,7 @@ export interface FileRouteTypes {
     | '/purchases'
     | '/reports'
     | '/sales'
+    | '/settings'
     | '/suppliers'
     | '/trips'
     | '/vehicles'
@@ -162,6 +172,7 @@ export interface FileRouteTypes {
     | '/purchases'
     | '/reports'
     | '/sales'
+    | '/settings'
     | '/suppliers'
     | '/trips'
     | '/vehicles'
@@ -177,6 +188,7 @@ export interface FileRouteTypes {
     | '/purchases'
     | '/reports'
     | '/sales'
+    | '/settings'
     | '/suppliers'
     | '/trips'
     | '/vehicles'
@@ -193,6 +205,7 @@ export interface RootRouteChildren {
   PurchasesRoute: typeof PurchasesRoute
   ReportsRoute: typeof ReportsRoute
   SalesRoute: typeof SalesRoute
+  SettingsRoute: typeof SettingsRoute
   SuppliersRoute: typeof SuppliersRoute
   TripsRoute: typeof TripsRoute
   VehiclesRoute: typeof VehiclesRoute
@@ -227,6 +240,13 @@ declare module '@tanstack/react-router' {
       path: '/suppliers'
       fullPath: '/suppliers'
       preLoaderRoute: typeof SuppliersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sales': {
@@ -305,6 +325,7 @@ const rootRouteChildren: RootRouteChildren = {
   PurchasesRoute: PurchasesRoute,
   ReportsRoute: ReportsRoute,
   SalesRoute: SalesRoute,
+  SettingsRoute: SettingsRoute,
   SuppliersRoute: SuppliersRoute,
   TripsRoute: TripsRoute,
   VehiclesRoute: VehiclesRoute,
@@ -313,3 +334,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
