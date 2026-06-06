@@ -36,11 +36,14 @@ function OrdersPage() {
   const [query, setQuery] = useState("");
   const [showActive, setShowActive] = useState(true);
   const [open, setOpen] = useState(false);
+  const [oneShot, setOneShot] = useState(false);
   const [editing, setEditing] = useState<COrder | null>(null);
   const [cancelTarget, setCancelTarget] = useState<COrder | null>(null);
 
+  const autoOrderNo = editing ? editing.no : nextNo("ORD");
+
   const fields: FieldDef[] = [
-    { name: "no", label: "Order No", required: true, half: true, placeholder: "ORD-..." },
+    { name: "no", label: "Order No (auto)", required: true, half: true, placeholder: autoOrderNo },
     { name: "date", label: "Date", type: "date", required: true, half: true },
     { name: "customer", label: "Customer", type: "select", required: true,
       options: active(customers).map((c) => ({ label: c.name, value: c.name })) },
@@ -70,7 +73,7 @@ function OrdersPage() {
     } else {
       const item: COrder = {
         id: newId("o"),
-        no: String(v.no || `ORD-${Date.now().toString().slice(-6)}`),
+        no: String(v.no || autoOrderNo),
         date: String(v.date),
         customer: String(v.customer),
         product: String(v.product),
