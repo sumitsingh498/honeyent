@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, Filter, Download, Pencil, Ban, FileDown } from "lucide-react";
+import { Plus, Filter, Download, Pencil, Ban, FileDown, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/page-header";
@@ -13,6 +13,8 @@ import { inr, statusTone, type OrderStatus } from "@/lib/mock-data";
 import { useErp, newId, active, type COrder } from "@/lib/store";
 import { EntityDialog, CancelDialog, type FieldDef } from "@/components/entity-dialog";
 import { generateDocPdf, generatePdf } from "@/lib/pdf";
+import { OneShotOrderDialog } from "@/components/one-shot-order";
+import { nextNo } from "@/lib/numbering";
 
 export const Route = createFileRoute("/orders")({
   head: () => ({ meta: [{ title: "Orders — Honey Enterprises ERP" }] }),
@@ -34,11 +36,14 @@ function OrdersPage() {
   const [query, setQuery] = useState("");
   const [showActive, setShowActive] = useState(true);
   const [open, setOpen] = useState(false);
+  const [oneShot, setOneShot] = useState(false);
   const [editing, setEditing] = useState<COrder | null>(null);
   const [cancelTarget, setCancelTarget] = useState<COrder | null>(null);
 
+  const autoOrderNo = editing ? editing.no : nextNo("ORD");
+
   const fields: FieldDef[] = [
-    { name: "no", label: "Order No", required: true, half: true, placeholder: "ORD-..." },
+    { name: "no", label: "Order No (auto)", required: true, half: true, placeholder: autoOrderNo },
     { name: "date", label: "Date", type: "date", required: true, half: true },
     { name: "customer", label: "Customer", type: "select", required: true,
       options: active(customers).map((c) => ({ label: c.name, value: c.name })) },
@@ -68,7 +73,7 @@ function OrdersPage() {
     } else {
       const item: COrder = {
         id: newId("o"),
-        no: String(v.no || `ORD-${Date.now().toString().slice(-6)}`),
+        no: String(v.no || autoOrderNo),
         date: String(v.date),
         customer: String(v.customer),
         product: String(v.product),
@@ -133,7 +138,8 @@ function OrdersPage() {
         actions={
           <>
             <Button variant="outline" size="sm" onClick={exportPdf}><Download className="mr-1 h-4 w-4" />Export PDF</Button>
-            <Button size="sm" onClick={() => { setEditing(null); setOpen(true); }}><Plus className="mr-1 h-4 w-4" />New order</Button>
+            <Button variant="outline" size="sm" onClick={() => { setEditing(null); setOpen(true); }}><Plus className="mr-1 h-4 w-4" />Manual</Button>
+            <Button size="sm" onClick={() => setOneShot(true)}><Sparkles className="mr-1 h-4 w-4" />One-Shot Order</Button>
           </>
         }
       />
@@ -215,6 +221,8 @@ function OrdersPage() {
           }
         }}
       />
+
+      <OneShotOrderDialog open={oneShot} onOpenChange={setOneShot} />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   Truck,
   ShoppingCart,
@@ -8,7 +9,9 @@ import {
   CalendarClock,
   TrendingUp,
   Route as RouteIcon,
+  Sparkles,
 } from "lucide-react";
+import { OneShotOrderDialog } from "@/components/one-shot-order";
 
 import { PageHeader } from "@/components/page-header";
 import { StatCard } from "@/components/stat-card";
@@ -43,6 +46,7 @@ function Dashboard() {
   const customers = active(useErp((s) => s.customers));
   const vehicles = active(useErp((s) => s.vehicles));
   const orders = active(useErp((s) => s.orders));
+  const [oneShot, setOneShot] = useState(false);
   const trips = active(useErp((s) => s.trips));
 
   const todayRevenue = trips.reduce((a, t) => a + t.revenue, 0);
@@ -71,8 +75,8 @@ function Dashboard() {
             <Button variant="outline" asChild>
               <Link to="/reports">View reports</Link>
             </Button>
-            <Button asChild>
-              <Link to="/orders">New order</Link>
+            <Button onClick={() => setOneShot(true)}>
+              <Sparkles className="mr-1 h-4 w-4" />One-Shot Order
             </Button>
           </>
         }
@@ -197,6 +201,8 @@ function Dashboard() {
           </div>
         </div>
       </div>
+
+      <OneShotOrderDialog open={oneShot} onOpenChange={setOneShot} />
     </div>
   );
 }

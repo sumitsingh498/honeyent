@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { loadCompany } from "./company";
 
 export interface PdfOptions {
   title: string;
@@ -10,10 +11,12 @@ export interface PdfOptions {
   totals?: { label: string; value: string }[];
 }
 
-const BRAND = "HONEY ENTERPRISES";
-const TAGLINE = "Stone Crusher • Aggregate Trading • Transport";
+function company() {
+  return loadCompany();
+}
 
 export function generatePdf(opts: PdfOptions): void {
+  const c = company();
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -23,10 +26,10 @@ export function generatePdf(opts: PdfOptions): void {
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(16);
-  doc.text(BRAND, 40, 32);
+  doc.text(c.name, 40, 32);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
-  doc.text(TAGLINE, 40, 48);
+  doc.text(c.tagline, 40, 48);
   doc.setFontSize(8);
   doc.text(`Generated: ${new Date().toLocaleString("en-IN")}`, pageW - 40, 32, { align: "right" });
 
@@ -73,7 +76,7 @@ export function generatePdf(opts: PdfOptions): void {
     doc.setFontSize(8);
     doc.setTextColor(100, 116, 139);
     doc.text(
-      `${BRAND} — Page ${p} of ${pages}`,
+      `${c.name}  •  ${c.phone}  •  ${c.email}  —  Page ${p} of ${pages}`,
       pageW / 2,
       doc.internal.pageSize.getHeight() - 20,
       { align: "center" },
@@ -96,6 +99,7 @@ export interface InvoicePdfOptions {
 }
 
 export function generateDocPdf(opts: InvoicePdfOptions): void {
+  const c = company();
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -104,11 +108,11 @@ export function generateDocPdf(opts: InvoicePdfOptions): void {
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
-  doc.text(BRAND, 40, 36);
+  doc.text(c.name, 40, 36);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
-  doc.text(TAGLINE, 40, 54);
-  doc.text("GSTIN: 06ABCDE1234F1Z5  •  contact@honeyenterprises.in", 40, 68);
+  doc.text(c.tagline, 40, 54);
+  doc.text(`GSTIN: ${c.gstin}  •  ${c.phone}  •  ${c.email}`, 40, 68);
 
   doc.setFontSize(13);
   doc.setFont("helvetica", "bold");
@@ -171,15 +175,13 @@ export function generateDocPdf(opts: InvoicePdfOptions): void {
     doc.text(`Remark: ${opts.remark}`, 40, y + 10);
   }
 
+  const pageH = doc.internal.pageSize.getHeight();
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(100, 116, 139);
-  doc.text(
-    "This is a computer-generated document. Subject to local jurisdiction.",
-    pageW / 2,
-    doc.internal.pageSize.getHeight() - 20,
-    { align: "center" },
-  );
+  doc.text(`Bank: ${c.bank}   •   UPI: ${c.upi}`, 40, pageH - 38);
+  doc.text(`${c.address}   •   ${c.phone}   •   ${c.email}`, 40, pageH - 26);
+  doc.text("Computer-generated document. E.&O.E. Subject to local jurisdiction.", pageW / 2, pageH - 14, { align: "center" });
 
   doc.save(opts.filename);
 }

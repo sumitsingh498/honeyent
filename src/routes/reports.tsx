@@ -1,15 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { toast } from "sonner";
+import { useState } from "react";
 import {
   Users, Factory, Truck, IdCard, Package, FileText, Receipt,
-  Route as RouteIcon, Scale, TrendingUp, Download,
+  Route as RouteIcon, Scale, TrendingUp, Eye,
 } from "lucide-react";
 
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { useErp, active } from "@/lib/store";
-import { generatePdf } from "@/lib/pdf";
 import { inr, daysUntil } from "@/lib/mock-data";
+import { ReportView, type ReportData } from "@/components/report-view";
 
 export const Route = createFileRoute("/reports")({
   head: () => ({ meta: [{ title: "Reports — Honey Enterprises ERP" }] }),
@@ -19,14 +19,14 @@ export const Route = createFileRoute("/reports")({
 type ReportKey =
   | "cust-outstanding" | "cust-sales" | "cust-ledger" | "cust-dispatch"
   | "sup-purchase" | "sup-ledger" | "sup-payables"
-  | "veh-pl" | "veh-expiry" | "veh-mileage" | "veh-maint"
-  | "drv-trips" | "drv-salary" | "drv-advance"
-  | "prod-sales" | "prod-purchase" | "prod-rate"
+  | "veh-pl" | "veh-expiry" | "veh-mileage"
+  | "drv-trips" | "drv-salary"
+  | "prod-sales" | "prod-rate" | "hsn-summary"
   | "trip-pl" | "trip-route" | "trip-cust"
   | "wb-loss" | "wb-compare"
-  | "fin-pl" | "fin-bs" | "fin-tb" | "fin-cash" | "fin-bank"
+  | "fin-pl" | "fin-bs" | "fin-tb"
   | "gst-r1" | "gst-r3b" | "gst-eway"
-  | "perf-daily" | "perf-monthly" | "perf-aging";
+  | "perf-daily" | "perf-monthly" | "perf-aging" | "top-customers";
 
 function ReportsPage() {
   const customers = useErp((s) => s.customers);
@@ -40,11 +40,13 @@ function ReportsPage() {
   const sales = useErp((s) => s.salesInvoices);
   const purchases = useErp((s) => s.purchaseInvoices);
 
-  function run(key: ReportKey, title: string) {
+  const [view, setView] = useState<ReportData | null>(null);
+
+  function build(key: ReportKey, title: string): ReportData {
     let head: string[] = [];
     let body: (string | number)[][] = [];
     let totals: { label: string; value: string }[] | undefined;
-    const stamp = `${title} • Generated ${new Date().toLocaleDateString("en-IN")} • Cancelled records excluded`;
+    const subtitle = `Generated ${new Date().toLocaleDateString("en-IN")} • Cancelled records excluded`;
 
     switch (key) {
       case "cust-outstanding":
@@ -96,7 +98,6 @@ function ReportsPage() {
           v.permitExpiry, daysUntil(v.permitExpiry)]);
         break;
       case "veh-mileage":
-      case "veh-maint":
         head = ["Vehicle", "Capacity", "Ownership"];
         body = active(vehicles).map((v) => [v.number, `${v.capacity} MT`, v.ownership]);
         break;
@@ -110,12 +111,10 @@ function ReportsPage() {
         });
         break;
       case "drv-salary":
-      case "drv-advance":
         head = ["Driver", "Mobile", "License", "Status"];
         body = active(drivers).map((d) => [d.name, d.mobile, d.license, d.status]);
         break;
       case "prod-sales":
-      case "prod-purchase":
         head = ["Product", "Total MT", "Total Value"];
         body = active(products).map((p) => {
           const list = active(orders).filter((o) => o.product === p.name);
@@ -125,6 +124,14 @@ function ReportsPage() {
       case "prod-rate":
         head = ["Code", "Product", "HSN", "Unit", "GST %", "Rate"];
         body = active(products).map((p) => [p.code, p.name, p.hsn, p.unit, `${p.gst}%`, inr(p.rate)]);
+        break;
+      case "hsn-summary":
+        head = ["HSN", "Products", "GST %", "Total Value"];
+        body = Array.from(new Set(active(products).map((p) => p.hsn))).map((h) => {
+          const list = active(products).filter((p) => p.hsn === h);
+          const orderList = active(orders).filter((o) => list.some((p) => p.name === o.product));
+          return [h, list.length, `${list[0]?.gst ?? 5}%`, inr(orderList.reduce((a, o) => a + o.qty * o.rate, 0))];
+        });
         break;
       case "trip-pl":
         head = ["Trip", "Date", "Route", "MT", "Revenue", "Expense", "Profit"];
@@ -171,8 +178,6 @@ function ReportsPage() {
         ];
         break;
       case "fin-tb":
-      case "fin-cash":
-      case "fin-bank":
         head = ["Account", "Debit", "Credit"];
         body = [
           ["Sales", "", inr(active(sales).reduce((a, i) => a + i.amount, 0))],
@@ -206,7 +211,7 @@ function ReportsPage() {
         ];
         break;
       case "perf-monthly":
-        head = ["Month", "Sales", "Purchases", "Profit"];
+        head = ["Period", "Sales", "Purchases", "Profit"];
         body = [["Current", inr(active(sales).reduce((a, i) => a + i.amount, 0)),
           inr(active(purchases).reduce((a, i) => a + i.amount, 0)),
           inr(active(trips).reduce((a, t) => a + (t.revenue - t.expense), 0))]];
@@ -215,15 +220,17 @@ function ReportsPage() {
         head = ["Customer", "Outstanding", "Status"];
         body = active(customers).filter((c) => c.outstanding > 0).map((c) => [c.name, inr(c.outstanding), c.outstanding > c.creditLimit ? "Over limit" : "Within limit"]);
         break;
+      case "top-customers": {
+        const rows = active(customers).map((c) => {
+          const list = active(orders).filter((o) => o.customer === c.name);
+          return { n: c.name, mt: list.reduce((a, o) => a + o.qty, 0), v: list.reduce((a, o) => a + o.qty * o.rate, 0) };
+        }).sort((a, b) => b.v - a.v);
+        head = ["Rank", "Customer", "Orders MT", "Total Value"];
+        body = rows.map((r, i) => [i + 1, r.n, r.mt, inr(r.v)]);
+        break;
+      }
     }
-
-    if (body.length === 0) {
-      toast.info(`${title}: no records to export.`);
-      return;
-    }
-
-    generatePdf({ title, subtitle: stamp, filename: `${key}-${Date.now()}.pdf`, head, body, totals });
-    toast.success(`${title} downloaded`);
+    return { title, subtitle, head, body, totals };
   }
 
   const groups: { group: string; icon: typeof Users; items: { label: string; key: ReportKey }[] }[] = [
@@ -232,6 +239,7 @@ function ReportsPage() {
       { label: "Sales Summary", key: "cust-sales" },
       { label: "Customer Ledger", key: "cust-ledger" },
       { label: "Dispatch Summary", key: "cust-dispatch" },
+      { label: "Top Customers", key: "top-customers" },
     ]},
     { group: "Suppliers", icon: Factory, items: [
       { label: "Purchase Summary", key: "sup-purchase" },
@@ -241,18 +249,16 @@ function ReportsPage() {
     { group: "Vehicles", icon: Truck, items: [
       { label: "Truck Profitability", key: "veh-pl" },
       { label: "Document Expiry", key: "veh-expiry" },
-      { label: "Diesel Mileage", key: "veh-mileage" },
-      { label: "Maintenance Log", key: "veh-maint" },
+      { label: "Fleet Master", key: "veh-mileage" },
     ]},
     { group: "Drivers", icon: IdCard, items: [
       { label: "Trips per Driver", key: "drv-trips" },
-      { label: "Salary Sheet", key: "drv-salary" },
-      { label: "Advance & Fine", key: "drv-advance" },
+      { label: "Driver Master", key: "drv-salary" },
     ]},
     { group: "Products", icon: Package, items: [
       { label: "Product-wise Sales", key: "prod-sales" },
-      { label: "Product-wise Purchase", key: "prod-purchase" },
-      { label: "Rate History", key: "prod-rate" },
+      { label: "Rate / HSN List", key: "prod-rate" },
+      { label: "HSN Summary", key: "hsn-summary" },
     ]},
     { group: "Trips", icon: RouteIcon, items: [
       { label: "Trip P&L", key: "trip-pl" },
@@ -267,8 +273,6 @@ function ReportsPage() {
       { label: "P&L", key: "fin-pl" },
       { label: "Balance Sheet", key: "fin-bs" },
       { label: "Trial Balance", key: "fin-tb" },
-      { label: "Cash Book", key: "fin-cash" },
-      { label: "Bank Book", key: "fin-bank" },
     ]},
     { group: "GST", icon: Receipt, items: [
       { label: "GSTR-1 Workbook", key: "gst-r1" },
@@ -286,7 +290,7 @@ function ReportsPage() {
     <div>
       <PageHeader
         title="Reports"
-        description="One-click PDF exports — cancelled documents are automatically excluded from every report."
+        description="Click any report to view on screen, then download PDF or share via WhatsApp / Email. Cancelled documents are excluded."
       />
       <div className="grid gap-4 p-6 md:grid-cols-2 lg:grid-cols-3">
         {groups.map((r) => (
@@ -301,8 +305,8 @@ function ReportsPage() {
               {r.items.map((item) => (
                 <li key={item.key} className="flex items-center justify-between gap-2 text-sm">
                   <span className="text-foreground">{item.label}</span>
-                  <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => run(item.key, item.label)}>
-                    <Download className="mr-1 h-3.5 w-3.5" />PDF
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => setView(build(item.key, item.label))}>
+                    <Eye className="mr-1 h-3.5 w-3.5" />View
                   </Button>
                 </li>
               ))}
@@ -310,6 +314,8 @@ function ReportsPage() {
           </div>
         ))}
       </div>
+
+      <ReportView open={!!view} onOpenChange={(v) => !v && setView(null)} report={view} />
     </div>
   );
 }
