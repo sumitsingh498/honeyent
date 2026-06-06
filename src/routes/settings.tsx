@@ -51,7 +51,7 @@ function SettingsPage() {
           ["customers","suppliers","products","vehicles","drivers","orders","weighSlips","trips","salesInvoices","purchaseInvoices"].forEach((k) => {
             const list = erp[k];
             if (Array.isArray(list)) {
-              const cur = (useErp.getState() as Record<string, unknown>)[k] as { id: string }[];
+              const cur = (useErp.getState() as unknown as Record<string, unknown>)[k] as { id: string }[];
               cur.forEach((it) => useErp.getState().remove(k as never, it.id));
               list.forEach((it: { id: string }) => useErp.getState().add(k as never, it as never));
             }
