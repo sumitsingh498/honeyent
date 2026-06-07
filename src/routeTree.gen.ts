@@ -25,81 +25,21 @@ import { Route as CustomersRouteImport } from './routes/customers'
 import { Route as CashbookRouteImport } from './routes/cashbook'
 import { Route as IndexRouteImport } from './routes/index'
 
-const WeighbridgeRoute = WeighbridgeRouteImport.update({
-  id: '/weighbridge',
-  path: '/weighbridge',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const VehiclesRoute = VehiclesRouteImport.update({
-  id: '/vehicles',
-  path: '/vehicles',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TripsRoute = TripsRouteImport.update({
-  id: '/trips',
-  path: '/trips',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SuppliersRoute = SuppliersRouteImport.update({
-  id: '/suppliers',
-  path: '/suppliers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReportsRoute = ReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductsRoute = ProductsRouteImport.update({
-  id: '/products',
-  path: '/products',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OrdersRoute = OrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LedgerRoute = LedgerRouteImport.update({
-  id: '/ledger',
-  path: '/ledger',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DriversRoute = DriversRouteImport.update({
-  id: '/drivers',
-  path: '/drivers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DispatchRoute = DispatchRouteImport.update({
-  id: '/dispatch',
-  path: '/dispatch',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DealsRoute = DealsRouteImport.update({
-  id: '/deals',
-  path: '/deals',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CustomersRoute = CustomersRouteImport.update({
-  id: '/customers',
-  path: '/customers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CashbookRoute = CashbookRouteImport.update({
-  id: '/cashbook',
-  path: '/cashbook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const WeighbridgeRoute = WeighbridgeRouteImport.update({ id: '/weighbridge', path: '/weighbridge', getParentRoute: () => rootRouteImport } as any)
+const VehiclesRoute = VehiclesRouteImport.update({ id: '/vehicles', path: '/vehicles', getParentRoute: () => rootRouteImport } as any)
+const TripsRoute = TripsRouteImport.update({ id: '/trips', path: '/trips', getParentRoute: () => rootRouteImport } as any)
+const SuppliersRoute = SuppliersRouteImport.update({ id: '/suppliers', path: '/suppliers', getParentRoute: () => rootRouteImport } as any)
+const SettingsRoute = SettingsRouteImport.update({ id: '/settings', path: '/settings', getParentRoute: () => rootRouteImport } as any)
+const ReportsRoute = ReportsRouteImport.update({ id: '/reports', path: '/reports', getParentRoute: () => rootRouteImport } as any)
+const ProductsRoute = ProductsRouteImport.update({ id: '/products', path: '/products', getParentRoute: () => rootRouteImport } as any)
+const OrdersRoute = OrdersRouteImport.update({ id: '/orders', path: '/orders', getParentRoute: () => rootRouteImport } as any)
+const LedgerRoute = LedgerRouteImport.update({ id: '/ledger', path: '/ledger', getParentRoute: () => rootRouteImport } as any)
+const DriversRoute = DriversRouteImport.update({ id: '/drivers', path: '/drivers', getParentRoute: () => rootRouteImport } as any)
+const DispatchRoute = DispatchRouteImport.update({ id: '/dispatch', path: '/dispatch', getParentRoute: () => rootRouteImport } as any)
+const DealsRoute = DealsRouteImport.update({ id: '/deals', path: '/deals', getParentRoute: () => rootRouteImport } as any)
+const CustomersRoute = CustomersRouteImport.update({ id: '/customers', path: '/customers', getParentRoute: () => rootRouteImport } as any)
+const CashbookRoute = CashbookRouteImport.update({ id: '/cashbook', path: '/cashbook', getParentRoute: () => rootRouteImport } as any)
+const IndexRoute = IndexRouteImport.update({ id: '/', path: '/', getParentRoute: () => rootRouteImport } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -118,23 +58,7 @@ export interface FileRoutesByFullPath {
   '/vehicles': typeof VehiclesRoute
   '/weighbridge': typeof WeighbridgeRoute
 }
-export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/cashbook': typeof CashbookRoute
-  '/customers': typeof CustomersRoute
-  '/deals': typeof DealsRoute
-  '/dispatch': typeof DispatchRoute
-  '/drivers': typeof DriversRoute
-  '/ledger': typeof LedgerRoute
-  '/orders': typeof OrdersRoute
-  '/products': typeof ProductsRoute
-  '/reports': typeof ReportsRoute
-  '/settings': typeof SettingsRoute
-  '/suppliers': typeof SuppliersRoute
-  '/trips': typeof TripsRoute
-  '/vehicles': typeof VehiclesRoute
-  '/weighbridge': typeof WeighbridgeRoute
-}
+export interface FileRoutesByTo extends FileRoutesByFullPath {}
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
@@ -227,131 +151,51 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/weighbridge': {
-      id: '/weighbridge'
-      path: '/weighbridge'
-      fullPath: '/weighbridge'
-      preLoaderRoute: typeof WeighbridgeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/vehicles': {
-      id: '/vehicles'
-      path: '/vehicles'
-      fullPath: '/vehicles'
-      preLoaderRoute: typeof VehiclesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/trips': {
-      id: '/trips'
-      path: '/trips'
-      fullPath: '/trips'
-      preLoaderRoute: typeof TripsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/suppliers': {
-      id: '/suppliers'
-      path: '/suppliers'
-      fullPath: '/suppliers'
-      preLoaderRoute: typeof SuppliersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reports': {
-      id: '/reports'
-      path: '/reports'
-      fullPath: '/reports'
-      preLoaderRoute: typeof ReportsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/products': {
-      id: '/products'
-      path: '/products'
-      fullPath: '/products'
-      preLoaderRoute: typeof ProductsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/orders': {
-      id: '/orders'
-      path: '/orders'
-      fullPath: '/orders'
-      preLoaderRoute: typeof OrdersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ledger': {
-      id: '/ledger'
-      path: '/ledger'
-      fullPath: '/ledger'
-      preLoaderRoute: typeof LedgerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/drivers': {
-      id: '/drivers'
-      path: '/drivers'
-      fullPath: '/drivers'
-      preLoaderRoute: typeof DriversRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dispatch': {
-      id: '/dispatch'
-      path: '/dispatch'
-      fullPath: '/dispatch'
-      preLoaderRoute: typeof DispatchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/deals': {
-      id: '/deals'
-      path: '/deals'
-      fullPath: '/deals'
-      preLoaderRoute: typeof DealsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/customers': {
-      id: '/customers'
-      path: '/customers'
-      fullPath: '/customers'
-      preLoaderRoute: typeof CustomersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cashbook': {
-      id: '/cashbook'
-      path: '/cashbook'
-      fullPath: '/cashbook'
-      preLoaderRoute: typeof CashbookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+    '/weighbridge': { id: '/weighbridge'; path: '/weighbridge'; fullPath: '/weighbridge'; preLoaderRoute: typeof WeighbridgeRouteImport; parentRoute: typeof rootRouteImport }
+    '/vehicles': { id: '/vehicles'; path: '/vehicles'; fullPath: '/vehicles'; preLoaderRoute: typeof VehiclesRouteImport; parentRoute: typeof rootRouteImport }
+    '/trips': { id: '/trips'; path: '/trips'; fullPath: '/trips'; preLoaderRoute: typeof TripsRouteImport; parentRoute: typeof rootRouteImport }
+    '/suppliers': { id: '/suppliers'; path: '/suppliers'; fullPath: '/suppliers'; preLoaderRoute: typeof SuppliersRouteImport; parentRoute: typeof rootRouteImport }
+    '/settings': { id: '/settings'; path: '/settings'; fullPath: '/settings'; preLoaderRoute: typeof SettingsRouteImport; parentRoute: typeof rootRouteImport }
+    '/reports': { id: '/reports'; path: '/reports'; fullPath: '/reports'; preLoaderRoute: typeof ReportsRouteImport; parentRoute: typeof rootRouteImport }
+    '/products': { id: '/products'; path: '/products'; fullPath: '/products'; preLoaderRoute: typeof ProductsRouteImport; parentRoute: typeof rootRouteImport }
+    '/orders': { id: '/orders'; path: '/orders'; fullPath: '/orders'; preLoaderRoute: typeof OrdersRouteImport; parentRoute: typeof rootRouteImport }
+    '/ledger': { id: '/ledger'; path: '/ledger'; fullPath: '/ledger'; preLoaderRoute: typeof LedgerRouteImport; parentRoute: typeof rootRouteImport }
+    '/drivers': { id: '/drivers'; path: '/drivers'; fullPath: '/drivers'; preLoaderRoute: typeof DriversRouteImport; parentRoute: typeof rootRouteImport }
+    '/dispatch': { id: '/dispatch'; path: '/dispatch'; fullPath: '/dispatch'; preLoaderRoute: typeof DispatchRouteImport; parentRoute: typeof rootRouteImport }
+    '/deals': { id: '/deals'; path: '/deals'; fullPath: '/deals'; preLoaderRoute: typeof DealsRouteImport; parentRoute: typeof rootRouteImport }
+    '/customers': { id: '/customers'; path: '/customers'; fullPath: '/customers'; preLoaderRoute: typeof CustomersRouteImport; parentRoute: typeof rootRouteImport }
+    '/cashbook': { id: '/cashbook'; path: '/cashbook'; fullPath: '/cashbook'; preLoaderRoute: typeof CashbookRouteImport; parentRoute: typeof rootRouteImport }
+    '/': { id: '/'; path: '/'; fullPath: '/'; preLoaderRoute: typeof IndexRouteImport; parentRoute: typeof rootRouteImport }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  CashbookRoute: CashbookRoute,
-  CustomersRoute: CustomersRoute,
-  DealsRoute: DealsRoute,
-  DispatchRoute: DispatchRoute,
-  DriversRoute: DriversRoute,
-  LedgerRoute: LedgerRoute,
-  OrdersRoute: OrdersRoute,
-  ProductsRoute: ProductsRoute,
-  ReportsRoute: ReportsRoute,
-  SettingsRoute: SettingsRoute,
-  SuppliersRoute: SuppliersRoute,
-  TripsRoute: TripsRoute,
-  VehiclesRoute: VehiclesRoute,
-  WeighbridgeRoute: WeighbridgeRoute,
+  IndexRoute,
+  CashbookRoute,
+  CustomersRoute,
+  DealsRoute,
+  DispatchRoute,
+  DriversRoute,
+  LedgerRoute,
+  OrdersRoute,
+  ProductsRoute,
+  ReportsRoute,
+  SettingsRoute,
+  SuppliersRoute,
+  TripsRoute,
+  VehiclesRoute,
+  WeighbridgeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
