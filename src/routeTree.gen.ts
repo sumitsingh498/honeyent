@@ -14,14 +14,15 @@ import { Route as VehiclesRouteImport } from './routes/vehicles'
 import { Route as TripsRouteImport } from './routes/trips'
 import { Route as SuppliersRouteImport } from './routes/suppliers'
 import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as SalesRouteImport } from './routes/sales'
 import { Route as ReportsRouteImport } from './routes/reports'
-import { Route as PurchasesRouteImport } from './routes/purchases'
 import { Route as ProductsRouteImport } from './routes/products'
 import { Route as OrdersRouteImport } from './routes/orders'
+import { Route as LedgerRouteImport } from './routes/ledger'
 import { Route as DriversRouteImport } from './routes/drivers'
 import { Route as DispatchRouteImport } from './routes/dispatch'
+import { Route as DealsRouteImport } from './routes/deals'
 import { Route as CustomersRouteImport } from './routes/customers'
+import { Route as CashbookRouteImport } from './routes/cashbook'
 import { Route as IndexRouteImport } from './routes/index'
 
 const WeighbridgeRoute = WeighbridgeRouteImport.update({
@@ -49,19 +50,9 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SalesRoute = SalesRouteImport.update({
-  id: '/sales',
-  path: '/sales',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ReportsRoute = ReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PurchasesRoute = PurchasesRouteImport.update({
-  id: '/purchases',
-  path: '/purchases',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductsRoute = ProductsRouteImport.update({
@@ -74,6 +65,11 @@ const OrdersRoute = OrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LedgerRoute = LedgerRouteImport.update({
+  id: '/ledger',
+  path: '/ledger',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DriversRoute = DriversRouteImport.update({
   id: '/drivers',
   path: '/drivers',
@@ -84,9 +80,19 @@ const DispatchRoute = DispatchRouteImport.update({
   path: '/dispatch',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DealsRoute = DealsRouteImport.update({
+  id: '/deals',
+  path: '/deals',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CustomersRoute = CustomersRouteImport.update({
   id: '/customers',
   path: '/customers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CashbookRoute = CashbookRouteImport.update({
+  id: '/cashbook',
+  path: '/cashbook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -97,14 +103,15 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cashbook': typeof CashbookRoute
   '/customers': typeof CustomersRoute
+  '/deals': typeof DealsRoute
   '/dispatch': typeof DispatchRoute
   '/drivers': typeof DriversRoute
+  '/ledger': typeof LedgerRoute
   '/orders': typeof OrdersRoute
   '/products': typeof ProductsRoute
-  '/purchases': typeof PurchasesRoute
   '/reports': typeof ReportsRoute
-  '/sales': typeof SalesRoute
   '/settings': typeof SettingsRoute
   '/suppliers': typeof SuppliersRoute
   '/trips': typeof TripsRoute
@@ -113,14 +120,15 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cashbook': typeof CashbookRoute
   '/customers': typeof CustomersRoute
+  '/deals': typeof DealsRoute
   '/dispatch': typeof DispatchRoute
   '/drivers': typeof DriversRoute
+  '/ledger': typeof LedgerRoute
   '/orders': typeof OrdersRoute
   '/products': typeof ProductsRoute
-  '/purchases': typeof PurchasesRoute
   '/reports': typeof ReportsRoute
-  '/sales': typeof SalesRoute
   '/settings': typeof SettingsRoute
   '/suppliers': typeof SuppliersRoute
   '/trips': typeof TripsRoute
@@ -130,14 +138,15 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/cashbook': typeof CashbookRoute
   '/customers': typeof CustomersRoute
+  '/deals': typeof DealsRoute
   '/dispatch': typeof DispatchRoute
   '/drivers': typeof DriversRoute
+  '/ledger': typeof LedgerRoute
   '/orders': typeof OrdersRoute
   '/products': typeof ProductsRoute
-  '/purchases': typeof PurchasesRoute
   '/reports': typeof ReportsRoute
-  '/sales': typeof SalesRoute
   '/settings': typeof SettingsRoute
   '/suppliers': typeof SuppliersRoute
   '/trips': typeof TripsRoute
@@ -148,14 +157,15 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/cashbook'
     | '/customers'
+    | '/deals'
     | '/dispatch'
     | '/drivers'
+    | '/ledger'
     | '/orders'
     | '/products'
-    | '/purchases'
     | '/reports'
-    | '/sales'
     | '/settings'
     | '/suppliers'
     | '/trips'
@@ -164,14 +174,15 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/cashbook'
     | '/customers'
+    | '/deals'
     | '/dispatch'
     | '/drivers'
+    | '/ledger'
     | '/orders'
     | '/products'
-    | '/purchases'
     | '/reports'
-    | '/sales'
     | '/settings'
     | '/suppliers'
     | '/trips'
@@ -180,14 +191,15 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/cashbook'
     | '/customers'
+    | '/deals'
     | '/dispatch'
     | '/drivers'
+    | '/ledger'
     | '/orders'
     | '/products'
-    | '/purchases'
     | '/reports'
-    | '/sales'
     | '/settings'
     | '/suppliers'
     | '/trips'
@@ -197,14 +209,15 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CashbookRoute: typeof CashbookRoute
   CustomersRoute: typeof CustomersRoute
+  DealsRoute: typeof DealsRoute
   DispatchRoute: typeof DispatchRoute
   DriversRoute: typeof DriversRoute
+  LedgerRoute: typeof LedgerRoute
   OrdersRoute: typeof OrdersRoute
   ProductsRoute: typeof ProductsRoute
-  PurchasesRoute: typeof PurchasesRoute
   ReportsRoute: typeof ReportsRoute
-  SalesRoute: typeof SalesRoute
   SettingsRoute: typeof SettingsRoute
   SuppliersRoute: typeof SuppliersRoute
   TripsRoute: typeof TripsRoute
@@ -249,25 +262,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/sales': {
-      id: '/sales'
-      path: '/sales'
-      fullPath: '/sales'
-      preLoaderRoute: typeof SalesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/reports': {
       id: '/reports'
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof ReportsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/purchases': {
-      id: '/purchases'
-      path: '/purchases'
-      fullPath: '/purchases'
-      preLoaderRoute: typeof PurchasesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/products': {
@@ -284,6 +283,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ledger': {
+      id: '/ledger'
+      path: '/ledger'
+      fullPath: '/ledger'
+      preLoaderRoute: typeof LedgerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/drivers': {
       id: '/drivers'
       path: '/drivers'
@@ -298,11 +304,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DispatchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/deals': {
+      id: '/deals'
+      path: '/deals'
+      fullPath: '/deals'
+      preLoaderRoute: typeof DealsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/customers': {
       id: '/customers'
       path: '/customers'
       fullPath: '/customers'
       preLoaderRoute: typeof CustomersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cashbook': {
+      id: '/cashbook'
+      path: '/cashbook'
+      fullPath: '/cashbook'
+      preLoaderRoute: typeof CashbookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -317,14 +337,15 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CashbookRoute: CashbookRoute,
   CustomersRoute: CustomersRoute,
+  DealsRoute: DealsRoute,
   DispatchRoute: DispatchRoute,
   DriversRoute: DriversRoute,
+  LedgerRoute: LedgerRoute,
   OrdersRoute: OrdersRoute,
   ProductsRoute: ProductsRoute,
-  PurchasesRoute: PurchasesRoute,
   ReportsRoute: ReportsRoute,
-  SalesRoute: SalesRoute,
   SettingsRoute: SettingsRoute,
   SuppliersRoute: SuppliersRoute,
   TripsRoute: TripsRoute,
@@ -334,13 +355,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -6,16 +6,17 @@ import {
   Scripts,
   useRouter,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
-import { Bell, Search } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { Bell, Command, Sparkles } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
+import { CommandPalette } from "@/components/command-palette";
+import { OneShotOrderDialog } from "@/components/one-shot-order";
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
@@ -106,6 +107,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const [oneShot, setOneShot] = useState(false);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -115,14 +117,18 @@ function RootComponent() {
           <div className="flex min-w-0 flex-1 flex-col">
             <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
               <SidebarTrigger />
-              <div className="relative ml-1 hidden max-w-md flex-1 md:block">
-                <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search orders, vehicles, customers…"
-                  className="h-9 border-border bg-card pl-8"
-                />
-              </div>
+              <button
+                onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}
+                className="hidden h-9 max-w-md flex-1 items-center gap-2 rounded-md border border-border bg-card px-3 text-left text-xs text-muted-foreground transition hover:border-primary/50 md:flex"
+              >
+                <Command className="h-3.5 w-3.5" />
+                <span>Quick search & jump…</span>
+                <kbd className="ml-auto rounded bg-muted px-1.5 py-0.5 font-mono text-[10px]">⌘K</kbd>
+              </button>
               <div className="ml-auto flex items-center gap-2">
+                <Button variant="outline" size="sm" className="hidden sm:inline-flex" onClick={() => setOneShot(true)}>
+                  <Sparkles className="mr-1 h-3.5 w-3.5" />One-Shot
+                </Button>
                 <Button variant="ghost" size="icon" aria-label="Notifications">
                   <Bell className="h-4 w-4" />
                 </Button>
@@ -142,6 +148,8 @@ function RootComponent() {
             </main>
           </div>
         </div>
+        <CommandPalette onCreate={() => setOneShot(true)} />
+        <OneShotOrderDialog open={oneShot} onOpenChange={setOneShot} />
         <Toaster richColors position="top-right" />
       </SidebarProvider>
     </QueryClientProvider>
