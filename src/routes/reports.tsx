@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Users, Factory, Truck, IdCard, Package, FileText, Receipt,
-  Route as RouteIcon, Scale, TrendingUp, Eye,
+  Route as RouteIcon, Scale, TrendingUp, Eye, Wrench, CalendarDays,
 } from "lucide-react";
 
 import { PageHeader } from "@/components/page-header";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useErp, active } from "@/lib/store";
 import { inr, daysUntil } from "@/lib/mock-data";
 import { ReportView, type ReportData } from "@/components/report-view";
+import { DateRangeFilter, EMPTY_RANGE, inRange, type DateRange } from "@/components/date-range-filter";
 
 export const Route = createFileRoute("/reports")({
   head: () => ({ meta: [{ title: "Reports — Honey Enterprises ERP" }] }),
@@ -19,14 +20,15 @@ export const Route = createFileRoute("/reports")({
 type ReportKey =
   | "cust-outstanding" | "cust-sales" | "cust-ledger" | "cust-dispatch"
   | "sup-purchase" | "sup-ledger" | "sup-payables"
-  | "veh-pl" | "veh-expiry" | "veh-mileage"
-  | "drv-trips" | "drv-salary"
+  | "veh-pl" | "veh-expiry" | "veh-mileage" | "veh-maint"
+  | "drv-trips" | "drv-salary" | "drv-salary-reg"
   | "prod-sales" | "prod-rate" | "hsn-summary"
   | "trip-pl" | "trip-route" | "trip-cust"
   | "wb-loss" | "wb-compare"
   | "fin-pl" | "fin-bs" | "fin-tb"
   | "gst-r1" | "gst-r3b" | "gst-eway"
-  | "perf-daily" | "perf-monthly" | "perf-aging" | "top-customers";
+  | "perf-daily" | "perf-monthly" | "perf-aging" | "top-customers"
+  | "ops-daily" | "exp-summary" | "exp-register";
 
 function ReportsPage() {
   const customers = useErp((s) => s.customers);
@@ -34,13 +36,23 @@ function ReportsPage() {
   const vehicles = useErp((s) => s.vehicles);
   const drivers = useErp((s) => s.drivers);
   const products = useErp((s) => s.products);
-  const orders = useErp((s) => s.orders);
-  const trips = useErp((s) => s.trips);
-  const slips = useErp((s) => s.weighSlips);
-  const sales = useErp((s) => s.salesInvoices);
-  const purchases = useErp((s) => s.purchaseInvoices);
+  const allOrders = useErp((s) => s.orders);
+  const allTrips = useErp((s) => s.trips);
+  const allSlips = useErp((s) => s.weighSlips);
+  const allSales = useErp((s) => s.salesInvoices);
+  const allPurchases = useErp((s) => s.purchaseInvoices);
+  const allExpenses = useErp((s) => s.expenses);
 
   const [view, setView] = useState<ReportData | null>(null);
+  const [range, setRange] = useState<DateRange>(EMPTY_RANGE);
+
+  // Apply date filter to all date-bearing entities
+  const orders = useMemo(() => allOrders.filter((o) => inRange(o.date, range)), [allOrders, range]);
+  const trips = useMemo(() => allTrips.filter((t) => inRange(t.date, range)), [allTrips, range]);
+  const slips = useMemo(() => allSlips.filter((w) => inRange(w.date, range)), [allSlips, range]);
+  const sales = useMemo(() => allSales.filter((i) => inRange(i.date, range)), [allSales, range]);
+  const purchases = useMemo(() => allPurchases.filter((i) => inRange(i.date, range)), [allPurchases, range]);
+  const expenses = useMemo(() => allExpenses.filter((e) => inRange(e.date, range)), [allExpenses, range]);
 
   function build(key: ReportKey, title: string): ReportData {
     let head: string[] = [];
