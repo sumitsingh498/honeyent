@@ -3,7 +3,7 @@
 
 import { useErp } from "./store";
 
-export type DocKind = "ORD" | "DC" | "WB" | "TR" | "INV" | "PUR";
+export type DocKind = "ORD" | "DC" | "WB" | "TR" | "INV" | "PUR" | "EXP" | "PAY";
 
 export function fyTag(d = new Date()): string {
   const y = d.getMonth() >= 3 ? d.getFullYear() : d.getFullYear() - 1;
@@ -32,6 +32,8 @@ export function nextNo(kind: DocKind): string {
     case "TR":  pool = s.trips.map((t) => t.tripNo); break;
     case "INV": pool = s.salesInvoices.map((i) => i.no); break;
     case "PUR": pool = s.purchaseInvoices.map((i) => i.no); break;
+    case "EXP": pool = s.expenses.map((e) => e.no); break;
+    case "PAY": pool = s.payments.map((p) => p.no); break;
   }
   const seq = maxSeq(pool, kind) + 1;
   return `${kind}/${fy}/${String(seq).padStart(4, "0")}`;
