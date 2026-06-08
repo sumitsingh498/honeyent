@@ -40,6 +40,44 @@ export type CWeighSlip = WeighSlip & Cancelable;
 export type CTrip = Trip & Cancelable;
 export type CInvoice = Invoice & Cancelable;
 
+export type ExpenseCategory =
+  | "Driver Salary"
+  | "Truck Repair"
+  | "Truck Maintenance"
+  | "Diesel / Fuel"
+  | "Tyre"
+  | "Toll / Parking"
+  | "Insurance / Permit"
+  | "Office / Admin"
+  | "Loading / Labour"
+  | "Other";
+
+export const EXPENSE_CATEGORIES: ExpenseCategory[] = [
+  "Driver Salary",
+  "Truck Repair",
+  "Truck Maintenance",
+  "Diesel / Fuel",
+  "Tyre",
+  "Toll / Parking",
+  "Insurance / Permit",
+  "Office / Admin",
+  "Loading / Labour",
+  "Other",
+];
+
+export interface Expense extends Cancelable {
+  id: string;
+  no: string;
+  date: string;
+  category: ExpenseCategory;
+  vehicle?: string;
+  driver?: string;
+  paidTo: string;
+  mode: "Cash" | "Bank" | "UPI" | "Cheque";
+  amount: number;
+  remark?: string;
+}
+
 export type EntityKey =
   | "customers"
   | "suppliers"
@@ -51,7 +89,8 @@ export type EntityKey =
   | "trips"
   | "salesInvoices"
   | "purchaseInvoices"
-  | "payments";
+  | "payments"
+  | "expenses";
 
 export interface Payment extends Cancelable {
   id: string;
@@ -77,6 +116,7 @@ interface State {
   salesInvoices: CInvoice[];
   purchaseInvoices: CInvoice[];
   payments: Payment[];
+  expenses: Expense[];
 }
 
 interface Actions {
@@ -86,6 +126,12 @@ interface Actions {
   remove: (key: EntityKey, id: string) => void;
   resetAll: () => void;
 }
+
+const seedExpenses: Expense[] = [
+  { id: "ex1", no: "EXP/25-26/0001", date: "2026-06-01", category: "Diesel / Fuel", vehicle: "HR55AB1234", paidTo: "HPCL Pump", mode: "Cash", amount: 7200, remark: "Trip to Gurugram" },
+  { id: "ex2", no: "EXP/25-26/0002", date: "2026-06-02", category: "Driver Salary", driver: "Ramesh Yadav", paidTo: "Ramesh Yadav", mode: "Bank", amount: 18000, remark: "May salary" },
+  { id: "ex3", no: "EXP/25-26/0003", date: "2026-06-02", category: "Truck Repair", vehicle: "HR38C5678", paidTo: "Tata Service", mode: "UPI", amount: 5400, remark: "Brake liner" },
+];
 
 const initial: State = {
   customers: seedCustomers,
@@ -99,6 +145,7 @@ const initial: State = {
   salesInvoices: seedSales,
   purchaseInvoices: seedPurchases,
   payments: [],
+  expenses: seedExpenses,
 };
 
 const noopStorage = {
@@ -140,7 +187,7 @@ export const useErp = create<State & Actions>()(
           ? window.localStorage
           : (noopStorage as unknown as Storage),
       ),
-      version: 1,
+      version: 2,
     },
   ),
 );
