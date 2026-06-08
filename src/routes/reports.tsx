@@ -242,6 +242,60 @@ function ReportsPage() {
         body = rows.map((r, i) => [i + 1, r.n, r.mt, inr(r.v)]);
         break;
       }
+      case "ops-daily": {
+        const byDay = new Map<string, { orders: number; mt: number; value: number; trips: number; rev: number; exp: number }>();
+        active(orders).forEach((o) => {
+          const r = byDay.get(o.date) ?? { orders: 0, mt: 0, value: 0, trips: 0, rev: 0, exp: 0 };
+          r.orders += 1; r.mt += o.qty; r.value += o.qty * o.rate;
+          byDay.set(o.date, r);
+        });
+        active(trips).forEach((t) => {
+          const r = byDay.get(t.date) ?? { orders: 0, mt: 0, value: 0, trips: 0, rev: 0, exp: 0 };
+          r.trips += 1; r.rev += t.revenue; r.exp += t.expense;
+          byDay.set(t.date, r);
+        });
+        const rows = Array.from(byDay.entries()).sort((a, b) => b[0].localeCompare(a[0]));
+        head = ["Date", "Orders", "Total MT", "Order Value", "Trips", "Freight Rev", "Trip Exp", "Net"];
+        body = rows.map(([d, r]) => [d, r.orders, r.mt, inr(r.value), r.trips, inr(r.rev), inr(r.exp), inr(r.rev - r.exp)]);
+        totals = [
+          { label: "Days", value: String(rows.length) },
+          { label: "Total order value", value: inr(rows.reduce((a, [, r]) => a + r.value, 0)) },
+          { label: "Net freight P&L", value: inr(rows.reduce((a, [, r]) => a + (r.rev - r.exp), 0)) },
+        ];
+        break;
+      }
+      case "exp-summary": {
+        const byCat = new Map<string, { count: number; amount: number }>();
+        active(expenses).forEach((e) => {
+          const r = byCat.get(e.category) ?? { count: 0, amount: 0 };
+          r.count += 1; r.amount += e.amount;
+          byCat.set(e.category, r);
+        });
+        const rows = Array.from(byCat.entries()).sort((a, b) => b[1].amount - a[1].amount);
+        head = ["Category", "Vouchers", "Amount"];
+        body = rows.map(([c, r]) => [c, r.count, inr(r.amount)]);
+        totals = [{ label: "Total expenses", value: inr(rows.reduce((a, [, r]) => a + r.amount, 0)) }];
+        break;
+      }
+      case "exp-register":
+        head = ["Voucher", "Date", "Category", "Paid To", "Vehicle/Driver", "Mode", "Amount"];
+        body = active(expenses).map((e) => [e.no, e.date, e.category, e.paidTo, e.vehicle || e.driver || "—", e.mode, inr(e.amount)]);
+        totals = [{ label: "Total", value: inr(active(expenses).reduce((a, e) => a + e.amount, 0)) }];
+        break;
+      case "drv-salary-reg": {
+        const list = active(expenses).filter((e) => e.category === "Driver Salary");
+        head = ["Voucher", "Date", "Driver", "Mode", "Amount", "Remark"];
+        body = list.map((e) => [e.no, e.date, e.driver || e.paidTo, e.mode, inr(e.amount), e.remark || ""]);
+        totals = [{ label: "Total salary paid", value: inr(list.reduce((a, e) => a + e.amount, 0)) }];
+        break;
+      }
+      case "veh-maint": {
+        const list = active(expenses).filter((e) => e.category === "Truck Repair" || e.category === "Truck Maintenance" || e.category === "Tyre");
+        head = ["Voucher", "Date", "Vehicle", "Category", "Vendor", "Amount", "Remark"];
+        body = list.map((e) => [e.no, e.date, e.vehicle || "—", e.category, e.paidTo, inr(e.amount), e.remark || ""]);
+        totals = [{ label: "Total maintenance", value: inr(list.reduce((a, e) => a + e.amount, 0)) }];
+        break;
+      }
     }
     return { title, subtitle, head, body, totals };
   }
