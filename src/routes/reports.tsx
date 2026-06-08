@@ -317,10 +317,12 @@ function ReportsPage() {
       { label: "Truck Profitability", key: "veh-pl" },
       { label: "Document Expiry", key: "veh-expiry" },
       { label: "Fleet Master", key: "veh-mileage" },
+      { label: "Vehicle Maintenance", key: "veh-maint" },
     ]},
     { group: "Drivers", icon: IdCard, items: [
       { label: "Trips per Driver", key: "drv-trips" },
       { label: "Driver Master", key: "drv-salary" },
+      { label: "Driver Salary Register", key: "drv-salary-reg" },
     ]},
     { group: "Products", icon: Package, items: [
       { label: "Product-wise Sales", key: "prod-sales" },
@@ -348,8 +350,15 @@ function ReportsPage() {
     ]},
     { group: "Performance", icon: TrendingUp, items: [
       { label: "Daily Snapshot", key: "perf-daily" },
+      { label: "Daily Operations", key: "ops-daily" },
       { label: "Monthly P&L", key: "perf-monthly" },
       { label: "Outstanding Aging", key: "perf-aging" },
+    ]},
+    { group: "Expenses", icon: Wrench, items: [
+      { label: "Expense Register", key: "exp-register" },
+      { label: "Category Summary", key: "exp-summary" },
+      { label: "Driver Salary Register", key: "drv-salary-reg" },
+      { label: "Vehicle Maintenance", key: "veh-maint" },
     ]},
   ];
 
