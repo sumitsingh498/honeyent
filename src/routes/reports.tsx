@@ -58,7 +58,8 @@ function ReportsPage() {
     let head: string[] = [];
     let body: (string | number)[][] = [];
     let totals: { label: string; value: string }[] | undefined;
-    const subtitle = `Generated ${new Date().toLocaleDateString("en-IN")} • Cancelled records excluded`;
+    const rangeNote = range.from || range.to ? ` • ${range.from || "…"} → ${range.to || "…"}` : " • All dates";
+    const subtitle = `Generated ${new Date().toLocaleDateString("en-IN")}${rangeNote} • Cancelled records excluded`;
 
     switch (key) {
       case "cust-outstanding":
