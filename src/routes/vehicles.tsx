@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, Pencil, Ban, Download } from "lucide-react";
+import { Plus, Pencil, Ban, Download, Eye } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/page-header";
@@ -102,6 +102,7 @@ function VehiclesPage() {
                   <TableCell>{expiryBadge(v.fitnessExpiry)}</TableCell>
                   <TableCell>{expiryBadge(v.permitExpiry)}</TableCell>
                   <TableCell className="text-right whitespace-nowrap">
+                    <Button variant="ghost" size="sm" asChild><Link to="/vehicles/$id" params={{ id: v.id }}><Eye className="h-3.5 w-3.5" /></Link></Button>
                     <Button variant="ghost" size="sm" onClick={() => { setEditing(v); setOpen(true); }}><Pencil className="h-3.5 w-3.5" /></Button>
                     <Button variant="ghost" size="sm" onClick={() => setCancelTarget(v)}><Ban className="h-3.5 w-3.5 text-destructive" /></Button>
                   </TableCell>

@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, Pencil, Ban, Download } from "lucide-react";
+import { Plus, Pencil, Ban, Download, Eye } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/page-header";
@@ -103,6 +103,7 @@ function SuppliersPage() {
                   <TableCell>{s.city}</TableCell>
                   <TableCell className={`text-right tabular-nums ${s.outstanding > 0 ? "text-warning" : "text-muted-foreground"}`}>{inr(s.outstanding)}</TableCell>
                   <TableCell className="text-right whitespace-nowrap">
+                    <Button variant="ghost" size="sm" asChild><Link to="/suppliers/$id" params={{ id: s.id }}><Eye className="h-3.5 w-3.5" /></Link></Button>
                     <Button variant="ghost" size="sm" onClick={() => { setEditing(s); setOpen(true); }}><Pencil className="h-3.5 w-3.5" /></Button>
                     <Button variant="ghost" size="sm" onClick={() => setCancelTarget(s)}><Ban className="h-3.5 w-3.5 text-destructive" /></Button>
                   </TableCell>

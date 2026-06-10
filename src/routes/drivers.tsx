@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, Pencil, Ban, Download } from "lucide-react";
+import { Plus, Pencil, Ban, Download, Eye } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/page-header";
@@ -90,6 +90,7 @@ function DriversPage() {
                     </TableCell>
                     <TableCell><Badge variant="outline" className={d.status === "Active" ? "bg-success/15 text-success" : "bg-muted text-muted-foreground"}>{d.status}</Badge></TableCell>
                     <TableCell className="text-right whitespace-nowrap">
+                      <Button variant="ghost" size="sm" asChild><Link to="/drivers/$id" params={{ id: d.id }}><Eye className="h-3.5 w-3.5" /></Link></Button>
                       <Button variant="ghost" size="sm" onClick={() => { setEditing(d); setOpen(true); }}><Pencil className="h-3.5 w-3.5" /></Button>
                       <Button variant="ghost" size="sm" onClick={() => setCancelTarget(d)}><Ban className="h-3.5 w-3.5 text-destructive" /></Button>
                     </TableCell>
