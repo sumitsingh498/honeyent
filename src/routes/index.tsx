@@ -12,6 +12,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { OneShotOrderDialog } from "@/components/one-shot-order";
+import { AlertCenter } from "@/components/alert-center";
 
 import { PageHeader } from "@/components/page-header";
 import { StatCard } from "@/components/stat-card";
@@ -129,29 +130,7 @@ function Dashboard() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-warning" />
-              <h2 className="font-display text-sm font-semibold">Document alerts</h2>
-            </div>
-            <ul className="mt-3 space-y-3">
-              {expiring.length === 0 ? (
-                <li className="text-xs text-muted-foreground">No expiries in the next 60 days.</li>
-              ) : (
-                expiring.map((e, i) => (
-                  <li key={i} className="flex items-start justify-between gap-2 text-sm">
-                    <div>
-                      <p className="font-mono text-xs text-foreground">{e.vehicle}</p>
-                      <p className="text-xs text-muted-foreground">{e.doc} • {e.date}</p>
-                    </div>
-                    <span className={`shrink-0 rounded-md px-2 py-0.5 text-[11px] font-medium ${e.days <= 7 ? "bg-destructive/15 text-destructive" : e.days <= 30 ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"}`}>
-                      {e.days <= 0 ? "Expired" : `${e.days}d`}
-                    </span>
-                  </li>
-                ))
-              )}
-            </ul>
-          </div>
+          <AlertCenter limit={6} />
 
           <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
             <div className="flex items-center gap-2">
